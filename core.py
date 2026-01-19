@@ -19,7 +19,7 @@ def add (name):
     student = Student(name=s_name,id=s_id)
     session.add(student)
     session.commit()
-    click.echo(f'{s_name} is added to the system successfully, its ID = {s_id}',fg='green')
+    click.secho(f'{s_name} is added to the system successfully, its ID = {s_id}',fg='green')
     click.secho(f"Note: Don't share your ID, you use it to update & delete",fg='red')
 
 @cli.command()
