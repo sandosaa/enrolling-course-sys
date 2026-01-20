@@ -27,8 +27,13 @@ def update():
     pass
 
 @cli.command()
-def delete():
-    pass
+@click.confirmation_option(prompt="Are you sure? you'll delete the student from the sys..")
+@click.option("--identify",'-i',help="Delete the student from the system by its ID",type=click.UUID)
+def delete(identify):
+    del_student=session.query(Student).filter_by(id=identify).one_or_none()
+    session.delete(del_student)
+    session.commit()
+    click.secho(f'Student: {del_student.name} with id : {del_student.id} is deleted successfully',fg='green')
 
 @cli.command()
 def view():
