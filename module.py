@@ -15,13 +15,13 @@ class Student(Base):
     __tablename__="Students"
     id=Column(types.UUID,primary_key=True)
     name=Column(String)
-    courses = relationship("Course",secondary="link")
+    courses = relationship("Course",secondary="link",back_populates='students')
     
 class Course(Base):
     __tablename__ ="Courses"
     id=Column(Integer,primary_key=True)
     subject=Column(String)
-    students=relationship("Student",secondary="link")
+    students=relationship("Student",secondary="link",back_populates='courses')
 
 
 Base.metadata.create_all(engine)

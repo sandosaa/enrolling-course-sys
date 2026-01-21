@@ -1,10 +1,7 @@
-from module import engine, Student
-from sqlalchemy.orm import sessionmaker
+from module import engine, Student,sessionmaker,Course,session
 import click
 import uuid
 
-Session = sessionmaker(bind=engine)
-session = Session()
 
 @click.group
 def cli():
@@ -24,8 +21,50 @@ def add (name):
     click.secho(f"Note: Don't share your ID, you use it to update & delete",fg='red')
 
 @cli.command()
-def update():
-    pass
+@click.option("--identify",'-i',help="ID used for editing the courses",type=click.UUID)
+@click.option("--append","-a",help="++ course")
+@click.option("--delete","-d",help="-- course")
+def update(identify,append,delete):
+    if not identify:
+        click.secho("You should enter the ID!",fg='red')
+    else:
+        s_t= session.query(Student).filter_by(id=identify).one_or_none()
+        if s_t:
+            if append:
+                append=append.upper()
+                if ('1' in add) or add=='DB':
+                    s_t.courses.append(Course(id=1))
+                    session.add(s_t)
+                    session.commit()
+                if ('2' in add) or add=='CI':
+                    s_t.courses.append(Course(id=2))
+                    session.add(s_t)
+                    session.commit()
+                if ('3' in add) or add=='DS':
+                    s_t.courses.append(Course(id=3))
+                    session.add(s_t)
+                    session.commit()
+                if ('4' in add) or add=='NLP':
+                    s_t.courses.append(Course(id=4))
+                    session.add(s_t)
+                    session.commit()
+                if ('5' in add) or add=='OS':
+                    s_t.courses.append(Course(id=5))
+                    session.add(s_t)
+                    session.commit()
+                if ('6' in add) or add=='MASD':
+                    s_t.courses.append(Course(id=6))
+                    session.add(s_t)
+                    session.commit()
+                if ('7' in add) or add=='CS':
+                    s_t.courses.append(Course(id=7))
+                    session.add(s_t)
+                    session.commit()   
+            if delete:
+                pass
+        else:
+            click.secho(f"The student with ID: {identify} is not found",fg='red')
+
 
 @cli.command()
 @click.confirmation_option(prompt="Are you sure? you'll delete the student from the sys..")
