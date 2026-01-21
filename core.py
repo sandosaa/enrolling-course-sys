@@ -88,6 +88,7 @@ def update(identify,append,delete):
                         click.secho(f"You enrolled \"Computer Security\" before!",fg='red')
                 
             if delete:
+
                 pass
         else:
             click.secho(f"The student with ID: {identify} is not found",fg='red')
@@ -115,8 +116,7 @@ def view():
         click.secho("No students found!", fg="red")
     else:
         for s in students:
-            click.secho(f"ID: {s.id} | Name: {s.name}", fg="blue")
-
+            click.secho(f"ID: {s.id} | Name: {s.name} & Enrolled {[sub.subject for sub in s.courses]}", fg="blue")
 
 @cli.command()
 def info(): #use this command to guide the user 
