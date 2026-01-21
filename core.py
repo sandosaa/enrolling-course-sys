@@ -1,7 +1,8 @@
-from module import engine, Student,sessionmaker,Course,session
+from module import engine, Student,sessionmaker,Course
 import click
 import uuid
-
+Session =sessionmaker(bind= engine)
+session = Session()
 
 @click.group
 def cli():
