@@ -1,5 +1,4 @@
-from module import engine, Student
-from sqlalchemy.orm import sessionmaker
+from module import engine, Student,sessionmaker
 import click
 import uuid
 
