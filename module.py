@@ -37,6 +37,8 @@ subjects=['Databases',
 Session =sessionmaker(bind= engine)
 session = Session()
 for i in subjects:
-    session.add(Course(subject=i))
-    session.commit()
+    is_exist=session.query(Course).filter_by(subject=i).first()
+    if not is_exist:
+        session.add(Course(subject=i))
+        session.commit()
 

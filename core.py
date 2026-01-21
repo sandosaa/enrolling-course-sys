@@ -1,9 +1,6 @@
-from module import engine, Student,sessionmaker,Course
+from module import Student,Course,session 
 import click
 import uuid
-Session =sessionmaker(bind= engine)
-session = Session()
-
 @click.group
 def cli():
     """A tool for groubing command line interface"""
@@ -11,13 +8,14 @@ def cli():
 
 @cli.command()
 @click.option('--name','-n',nargs=2,help="Add First & Last student's name to the system",type= str)
-def add (name):
+def create (name):
     """Add a new student to the system"""
     s_name = (name[0] + " " + name[1]).title()
     s_id = uuid.uuid4()
     student = Student(name=s_name,id=s_id)
     session.add(student)
     session.commit()
+    session.close()
     click.secho(f'{s_name} is added to the system successfully, its ID = {s_id}',fg='green')
     click.secho(f"Note: Don't share your ID, you use it to update & delete",fg='red')
 
@@ -33,34 +31,62 @@ def update(identify,append,delete):
         if s_t:
             if append:
                 append=append.upper()
-                if ('1' in add) or add=='DB':
-                    s_t.courses.append(Course(id=1))
-                    session.add(s_t)
-                    session.commit()
-                if ('2' in add) or add=='CI':
-                    s_t.courses.append(Course(id=2))
-                    session.add(s_t)
-                    session.commit()
-                if ('3' in add) or add=='DS':
-                    s_t.courses.append(Course(id=3))
-                    session.add(s_t)
-                    session.commit()
-                if ('4' in add) or add=='NLP':
-                    s_t.courses.append(Course(id=4))
-                    session.add(s_t)
-                    session.commit()
-                if ('5' in add) or add=='OS':
-                    s_t.courses.append(Course(id=5))
-                    session.add(s_t)
-                    session.commit()
-                if ('6' in add) or add=='MASD':
-                    s_t.courses.append(Course(id=6))
-                    session.add(s_t)
-                    session.commit()
-                if ('7' in add) or add=='CS':
-                    s_t.courses.append(Course(id=7))
-                    session.add(s_t)
-                    session.commit()   
+                if ('1' in append) or append=='DB':
+                    sub= session.query(Course).get(1)
+                    if sub not in s_t.courses:
+                        s_t.courses.append(sub)
+                        session.commit()
+                    else:
+                        click.secho(f"You enrolled \"Databases\" before!",fg='red')
+
+                if ('2' in append) or append=='CI':
+                    sub= session.query(Course).get(2)
+                    if sub not in s_t.courses:
+                        s_t.courses.append(sub)
+                        session.commit()
+                    else:
+                        click.secho(f"You enrolled \"Computational Intelligence\" before!",fg='red')
+
+                if ('3' in append) or append=='DS':
+                    sub= session.query(Course).get(3)
+                    if sub not in s_t.courses:
+                        s_t.courses.append(sub)
+                        session.commit()
+                    else:
+                        click.secho(f"You enrolled \"Data Structures\" before!",fg='red')
+
+                if ('4' in append) or append=='NLP':
+                    sub= session.query(Course).get(4)
+                    if sub not in s_t.courses:
+                        s_t.courses.append(sub)
+                        session.commit()
+                    else:
+                        click.secho(f"You enrolled \"Natural Language Processing\" before!",fg='red')
+
+                if ('5' in append) or append=='OS':
+                    sub= session.query(Course).get(5)
+                    if sub not in s_t.courses:
+                        s_t.courses.append(sub)
+                        session.commit()
+                    else:
+                        click.secho(f"You enrolled \"Operating Systems\" before!",fg='red')
+
+                if ('6' in append) or append=='MASD':
+                    sub= session.query(Course).get(6)
+                    if sub not in s_t.courses:
+                        s_t.courses.append(sub)
+                        session.commit()
+                    else:
+                        click.secho(f"You enrolled \"Multi Agent Systems Design\" before!",fg='red')
+
+                if ('7' in append) or append=='CS':
+                    sub= session.query(Course).get(7)
+                    if sub not in s_t.courses:
+                        s_t.courses.append(sub)
+                        session.commit()
+                    else:
+                        click.secho(f"You enrolled \"Computer Security\" before!",fg='red')
+                
             if delete:
                 pass
         else:
