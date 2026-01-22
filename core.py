@@ -1,6 +1,9 @@
-from module import Student,Course,session 
+from modules import Student, Course
+from db import session
+from init import course_map
 import click
 import uuid
+
 @click.group
 def cli():
     """A tool for groubing command line interface"""
@@ -20,79 +23,47 @@ def create (name):
     click.secho(f"Note: Don't share your ID, you use it to update & delete",fg='red')
 
 @cli.command()
-@click.option("--identify",'-i',help="ID used for editing the courses",type=click.UUID)
-@click.option("--append","-a",help="++ course")
-@click.option("--delete","-d",help="-- course")
-def update(identify,append,delete):
+@click.option("--identify", '-i', help="ID used for editing the courses", type=click.UUID)
+@click.option("--append", "-a", help="++ course")
+@click.option("--delete", "-d", help="-- course")
+def update(identify, append, delete):
+    """Update a student's enrolled courses by its ID"""
     if not identify:
-        click.secho("You should enter the ID!",fg='red')
-    else:
-        s_t= session.query(Student).filter_by(id=identify).one_or_none()
-        if s_t:
-            if append:
-                append=append.upper()
-                if ('1' in append) or append=='DB':
-                    sub= session.query(Course).get(1)
-                    if sub not in s_t.courses:
-                        s_t.courses.append(sub)
-                        session.commit()
-                    else:
-                        click.secho(f"You enrolled \"Databases\" before!",fg='red')
+        click.secho("You should enter the ID!", fg='red')
+        return
 
-                if ('2' in append) or append=='CI':
-                    sub= session.query(Course).get(2)
-                    if sub not in s_t.courses:
-                        s_t.courses.append(sub)
-                        session.commit()
-                    else:
-                        click.secho(f"You enrolled \"Computational Intelligence\" before!",fg='red')
+    student = session.query(Student).filter_by(id=identify).one_or_none()
+    if not student:
+        click.secho(f"The student with ID: {identify} is not found", fg='red')
+        return
 
-                if ('3' in append) or append=='DS':
-                    sub= session.query(Course).get(3)
-                    if sub not in s_t.courses:
-                        s_t.courses.append(sub)
-                        session.commit()
-                    else:
-                        click.secho(f"You enrolled \"Data Structures\" before!",fg='red')
-
-                if ('4' in append) or append=='NLP':
-                    sub= session.query(Course).get(4)
-                    if sub not in s_t.courses:
-                        s_t.courses.append(sub)
-                        session.commit()
-                    else:
-                        click.secho(f"You enrolled \"Natural Language Processing\" before!",fg='red')
-
-                if ('5' in append) or append=='OS':
-                    sub= session.query(Course).get(5)
-                    if sub not in s_t.courses:
-                        s_t.courses.append(sub)
-                        session.commit()
-                    else:
-                        click.secho(f"You enrolled \"Operating Systems\" before!",fg='red')
-
-                if ('6' in append) or append=='MASD':
-                    sub= session.query(Course).get(6)
-                    if sub not in s_t.courses:
-                        s_t.courses.append(sub)
-                        session.commit()
-                    else:
-                        click.secho(f"You enrolled \"Multi Agent Systems Design\" before!",fg='red')
-
-                if ('7' in append) or append=='CS':
-                    sub= session.query(Course).get(7)
-                    if sub not in s_t.courses:
-                        s_t.courses.append(sub)
-                        session.commit()
-                    else:
-                        click.secho(f"You enrolled \"Computer Security\" before!",fg='red')
-                
-            if delete:
-
-                pass
+    if append:
+        append = append.upper()
+        subject = course_map.get(append)
+        if subject:
+            sub = session.query(Course).filter_by(subject=subject).first()
+            if sub not in student.courses:
+                student.courses.append(sub)
+                session.commit()
+                click.secho(f"Course \"{subject}\" added successfully.", fg='green')
+            else:
+                click.secho(f"You enrolled \"{subject}\" before!", fg='red')
         else:
-            click.secho(f"The student with ID: {identify} is not found",fg='red')
+            click.secho("Invalid course code!", fg='red')
 
+    if delete:
+        delete = delete.upper()
+        subject = course_map.get(delete)
+        if subject:
+            sub = session.query(Course).filter_by(subject=subject).first()
+            if sub in student.courses:
+                student.courses.remove(sub)
+                session.commit()
+                click.secho(f"Course \"{subject}\" removed successfully.", fg='green')
+            else:
+                click.secho(f"You are not enrolled in \"{subject}\".", fg='red')
+        else:
+            click.secho("Invalid course code!", fg='red')
 
 @cli.command()
 @click.confirmation_option(prompt="Are you sure? you'll delete the student from the sys..")
@@ -117,6 +88,36 @@ def view():
     else:
         for s in students:
             click.secho(f"ID: {s.id} | Name: {s.name} & Enrolled {[sub.subject for sub in s.courses]}", fg="blue")
+
+
+@cli.command()
+def list_courses():
+    """List all available courses with codes and IDs"""
+    click.secho("Available Courses:", fg="green", bold=True)
+    printed = set()
+    for key, subject in course_map.items():
+        if subject not in printed:
+            codes = [k for k, v in course_map.items() if v == subject]
+            click.secho(f"{subject} -> options: {', '.join(codes)}", fg="blue")
+            printed.add(subject)
+            
+
+@cli.command()
+@click.option('--id', prompt="Student ID", type=click.UUID)
+def student_info(id):
+    """Display information about a specific student"""
+    student = session.query(Student).filter_by(id=id).one_or_none()
+    if student:
+        click.secho(f"Name: {student.name}", fg="green", bold=True)
+        if student.courses:
+            click.secho("Enrolled Courses:", fg="green")
+            for c in student.courses:
+                click.secho(f"- {c.subject}", fg="blue")
+        else:
+            click.secho("No courses enrolled yet.", fg="red")
+    else:
+        click.secho("Student not found!", fg="red")
+        
 
 @cli.command()
 def info(): #use this command to guide the user 
