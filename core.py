@@ -1,6 +1,4 @@
-from modules import Student, Course
-from db import session
-from init import course_map
+from modules import Student, Course,course_map,session
 import click
 import uuid
 
@@ -95,7 +93,7 @@ def list_courses():
     """List all available courses with codes and IDs"""
     click.secho("Available Courses:", fg="green", bold=True)
     printed = set()
-    for key, subject in course_map.items():
+    for subject in course_map.values():
         if subject not in printed:
             codes = [k for k, v in course_map.items() if v == subject]
             click.secho(f"{subject} -> options: {', '.join(codes)}", fg="blue")
@@ -103,7 +101,7 @@ def list_courses():
             
 
 @cli.command()
-@click.option('--id', prompt="Student ID", type=click.UUID)
+@click.option('--id','-i', prompt="Student ID", type=click.UUID)
 def student_info(id):
     """Display information about a specific student"""
     student = session.query(Student).filter_by(id=id).one_or_none()
@@ -124,6 +122,7 @@ def info(): #use this command to guide the user
     """Display information about the system"""
     click.secho("University Course Enrollment System",blink=True,fg='blue',bold=True)
     click.secho('Welcome to our System!',fg='green')
+    click.echo('To know about the system enter \'--help\'')
 
 
 #learn the best way to add courses than edit the engine base and complete the ather function

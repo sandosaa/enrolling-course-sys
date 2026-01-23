@@ -1,6 +1,9 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, types
-from sqlalchemy.orm import relationship
-from db import Base
+from sqlalchemy import create_engine, Integer,Column,String,types,ForeignKey    
+from sqlalchemy.orm import declarative_base,relationship,sessionmaker
+
+data_base_url = "sqlite:///database.db"
+engine = create_engine(data_base_url)
+Base = declarative_base()
 
 class stu_cour(Base): #associative
     __tablename__ = "link"
@@ -21,3 +24,30 @@ class Course(Base):
     students=relationship("Student",secondary="link",back_populates='courses')
 
 
+Base.metadata.create_all(engine)
+
+course_map = {
+    '1': 'Databases', 'DB': 'Databases',
+    '2': 'Computational Intelligence', 'CI': 'Computational Intelligence',
+    '3': 'Data Structures', 'DS': 'Data Structures',
+    '4': 'Natural Language Processing', 'NLP': 'Natural Language Processing',
+    '5': 'Operating Systems', 'OS': 'Operating Systems',
+    '6': 'Multi Agent Systems Design', 'MASD': 'Multi Agent Systems Design',
+    '7': 'Computer Security', 'CS': 'Computer Security'
+}
+
+subjects=['Databases',
+    'Computational Intelligence',
+    'Data Structures',
+    'Natural Language Processing',
+    'Operating Systems',
+    'Multi Agent Systems Design',
+    'Computer Security']
+
+Session =sessionmaker(bind= engine)
+session = Session()
+for i in subjects:
+    is_exist=session.query(Course).filter_by(subject=i).first()
+    if not is_exist:
+        session.add(Course(subject=i))
+        session.commit()
